@@ -1,20 +1,21 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MegaDesk2._0___Team_Cumorah
 {
     public static class DataStorage
     {
-        private const string FILENAME = "quotes.json";
+        private const string FILENAME = "NewJsonQuotes.json";
         public static List<DeskQuote> DeskQuotes = new List<DeskQuote>();
 
-        public static void AddQuote(DeskQuote deskQuote) 
+        public async static void AddQuote(DeskQuote deskQuote) 
         {  
             DeskQuotes.Add(deskQuote);
-            Serialize();
+            await Serialize();
         }
 
         public static List<DeskQuote> SearchDeskQuote(DesktopMaterial desktopMaterial)
@@ -23,12 +24,12 @@ namespace MegaDesk2._0___Team_Cumorah
             return filterQuotes;
         }
 
-        public static void Serialize()
+        public async static Task Serialize()
         {
             try
             {
-                var json = JsonConvert.SerializeObject(DeskQuotes);
-                File.WriteAllText(FILENAME, json);
+                var createStream = File.Create(FILENAME);
+                await JsonSerializer.SerializeAsync(createStream, DeskQuotes);
             }
             catch (Exception e)
             {
@@ -42,7 +43,7 @@ namespace MegaDesk2._0___Team_Cumorah
             try
             {
                 string json = File.ReadAllText(FILENAME);
-                DeskQuotes = JsonConvert.DeserializeObject<List<DeskQuote>>(json);
+                DeskQuotes = JsonSerializer.Deserialize<List<DeskQuote>>(json);
             }
             catch (Exception e)
             {
